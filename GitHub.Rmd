@@ -77,7 +77,8 @@ RMSE(predictions, test.data$sales)
 R2(predictions, test.data$sales)
 ```
 
-                                                                                             
+          
+                                                                                       
 
 
 
