@@ -1,0 +1,20 @@
+---
+title: "Data Wrangling"
+output: html_notebook
+---
+First, we are going to load the tidyverse package.
+
+```{r}
+library(tidyverse) #Loading necessary package
+```
+
+
+# Creating a tibble
+
+```{r}
+tribble(~number, ~letter,   ~greek,
+              1,     "a",  "alpha",
+              2,     "b",   "beta",
+              3,     "c",  "gamma")
+```
+
