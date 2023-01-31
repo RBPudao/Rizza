@@ -4,27 +4,88 @@ author: "Pudao, Rizza B."
 date: "2022-11-22"
 output: pdf_document
 ---
+---
+title: "Regression with Interaction"
+output:
+  pdf_document: default
+  html_notebook: default
+---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r}
+library(tidyverse)
+library(caret)
+
 ```
 
-## R Markdown
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+```{r}
+# Load the data
+data("marketing", package = "datarium")
+# Inspect the data
+sample_n(marketing, 3)
 ```
 
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r}
+# Split the data into training and test set
+set.seed(123)
+training.samples <- marketing$sales %>%
+  createDataPartition(p = 0.8, list = FALSE)
+train.data  <- marketing[training.samples, ]
+test.data <- marketing[-training.samples, ]
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+```{r}
+# Build the model
+model1 <- lm(sales ~ youtube + facebook, data = train.data)
+# Summarize the model
+summary(model1)
+```
+
+```{r}
+# Make predictions
+predictions <- model1 %>% predict(test.data)
+# Model performance
+# (a) Prediction error, RMSE
+RMSE(predictions, test.data$sales)
+```
+
+```{r}
+# (b) R-square
+R2(predictions, test.data$sales)
+```
+
+```{r}
+# Build the model
+# Use this: 
+model2 <- lm(sales ~ youtube + facebook + youtube:facebook,
+             data = marketing)
+# Or simply, use this: 
+model2 <- lm(sales ~ youtube*facebook, data = train.data)
+# Summarize the model
+summary(model2)
+```
+
+```{r}
+# Make predictions
+predictions <- model2 %>% predict(test.data)
+# Model performance
+# (a) Prediction error, RMSE
+RMSE(predictions, test.data$sales)
+```
+
+```{r}
+# (b) R-square
+R2(predictions, test.data$sales)
+```
+
+                                                                                             
+
+
+
+
+
+
+
+
+
+
+
