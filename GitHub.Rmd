@@ -1,15 +1,10 @@
 ---
-title: "R"
+title: "Regression with Interaction"
 author: "Pudao, Rizza B."
 date: "2022-11-22"
 output: pdf_document
 ---
----
-title: "Regression with Interaction"
-output:
-  pdf_document: default
-  html_notebook: default
----
+
 
 ```{r}
 library(tidyverse)
