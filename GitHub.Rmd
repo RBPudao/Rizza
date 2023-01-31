@@ -1,9 +1,236 @@
 ---
-title: "Regression with Interaction"
-author: "Pudao, Rizza B."
-date: "2022-11-22"
-output: pdf_document
+title: "regression assignment"
+output: html_notebook
 ---
+
+##### **Introduction**
+
+This is about regression. we are going to perform regression analysis using marketing data of the datarium package in r.
+
+##### **The Data**
+
+The marketing data has 200 observations and 4 variables namely; youtube, facebook, newspaper, and sales.
+
+```{r echo=FALSE, results='hide'}
+library(tidyverse) 
+library(caret) 
+theme_set (theme_bw())
+```
+
+```{r echo=FALSE, results='hide'}
+# install datarium if not installed at the console
+library(datarium) # loading datarium
+```
+
+```{r echo=FALSE, results='markup'}
+# load the data
+data ("marketing", package = "datarium")
+sample_n(marketing, 3)
+```
+
+```{r echo=FALSE, results='markup'}
+# Split the data into training and test set
+set.seed(123)
+training.samples <- marketing$sales %>%
+  createDataPartition(p = 0.8, list = FALSE)
+train.data  <- marketing[training.samples, ]
+test.data <- marketing[-training.samples, ]
+```
+
+```{r echo=FALSE, results='markup'}
+# Build the model
+model <- lm(sales ~., data = train.data)
+# Summarize the model
+summary(model)
+# Make predictions
+predictions <- model %>% predict(test.data)
+# Model performance
+# (a) Prediction error, RMSE
+RMSE(predictions, test.data$sales)
+# (b) R-square
+R2(predictions, test.data$sales)
+```
+
+```{r echo=FALSE, results='markup'}
+# predicting with new data
+# using the model
+youtube <- 30
+facebook <- 45
+newspaper <- 13
+a <- data.frame (youtube = 30,
+                 facebook = 45,
+                 newspaper = 13)
+a <- data.frame(youtube, facebook, newspaper)
+p <- model%>% predict(a)
+p
+```
+
+our model is as follows:
+$$\hat{y} = 3.59 + 0.04x_1 +0.19x_2 + \epsilon$$
+where $\hat{y}$is sales, 5x_1 is youtube, 5x_2 is facebook, and $\epsilon$ is the error term.
+
+
+# ***`Simple linear regression`***
+
+This  shows the estimate of the regression beta coefficients (column Estimate) and their significance levels (column Pr(>|t|). The intercept (b0) is 8.58 and the coefficient of youtube variable is 0.046.
+
+
+```{r echo=FALSE, results='markup'}
+model <- lm(sales ~ youtube, data = train.data)
+summary(model)$coef
+```
+This table shows the predictions on the sales units for two youtube advertising budget: 0 and 1000 made using the R function predict()
+```{r echo=FALSE, results='markup'}
+newdata <- data.frame(youtube = c(0,  1000))
+model %>% predict(newdata)
+```
+
+# ***`Multiple linear regression`***
+This data illustrates the predictions of sales based on the budget invested in three advertising medias: youtube, facebook and newspaper.
+
+```{r echo=FALSE, results='markup'}
+model <- lm(sales ~ youtube + facebook + newspaper, 
+            data = train.data)
+summary(model)$coef
+```
+
+also shows the beta coefficient estimates and their significance levels. 
+```{r echo=FALSE, results='markup'}
+model <- lm(sales ~., data = train.data)
+summary(model)$coef
+```
+
+This shows the result of predictions using the R function predict()
+```{r echo=FALSE, results='markup'}
+# New advertising budgets
+newdata <- data.frame(youtube = 30, facebook = 45,
+  newspaper = 13)
+# Predict sales values
+model %>% predict(newdata)
+```
+
+# ***`Model summary`***
+This summary outputs shows 6 components, including:
+
+##### **1.Call**
+it Shows the function call used to compute the regression model.
+
+##### **2. Residuals**
+Provide a quick view of the distribution of the residuals, which by definition have a mean zero. Therefore, the median should not be far from zero, and the minimum and maximum should be roughly equal in absolute value.
+
+##### **3.Coefficients**
+Shows the regression beta coefficients and their statistical significance. Predictor variables, that are significantly associated to the outcome variable, are marked by stars.
+
+##### **4. Residual standard error (RSE)**
+
+##### **5.R-squared (R2)**
+
+##### **6.F-statistic**
+Residual standard error (RSE), R-squared (R2) and the F-statistic are metrics that are used to check how well the model fits to our data.
+
+```{r echo=FALSE, results='markup'}
+summary(model)
+```
+
+# ***`Coefficients significance`***
+This shows the estimate of regression beta coefficients and the associated t-statistic p-values.
+
+```{r echo=FALSE, results='markup'}
+summary(model)$coef
+```
+
+
+```{r echo=FALSE, results='markup'}
+model <- lm(sales ~ youtube + facebook, data = train.data)
+summary(model)
+```
+
+# ***`Making predictions`***
+This shows predictions using the test data in order to evaluate the performance of our regression model. 
+it Predict the sales values based on new advertising budgets in the test data
+
+```{r echo=FALSE, results='markup'}
+# Make predictions
+predictions <- model %>% predict(test.data)
+# Model performance
+# (a) Compute the prediction error, RMSE
+RMSE(predictions, test.data$sales)
+```
+
+The table above shows the computed assessment of the model performance using the prediction error RMSE (Root Mean Squared Error).
+ 
+```{r echo=FALSE, results='markup'}
+# (b) Compute R-square
+R2(predictions, test.data$sales)
+```
+The table above  shows the computed assessment of the model performance using the The R-square (R2).
+
+# ***`Plot`***
+This shows a linearly increasing relationship between the sales and the youtube variables.
+```{r echo=FALSE, results='markup'}
+ggplot(marketing, aes(x = youtube, y = sales)) +
+  geom_point() +
+  stat_smooth()
+```
+
+
+
+## Regression with Cathegosical Variables
+
+
+
+```{r}
+library(tidyverse)
+library(car)
+```
+
+```{r}
+# Load the data
+data("Salaries", package = "car")
+# Inspect the data
+sample_n(Salaries, 3)
+```
+
+```{r}
+# Compute the model
+model <- lm(salary ~ sex, data = Salaries)
+summary(model)$coef %>%
+  round(digits = 2)
+```
+
+```{r}
+contrasts(Salaries$sex)
+```
+
+```{r}
+Salaries <- Salaries %>%
+  mutate(sex = relevel(sex, ref = "Male"))
+```
+
+```{r}
+model <- lm(salary ~ sex, data = Salaries)
+summary(model)$coef
+```
+
+```{r}
+library(car)
+model2 <- lm(salary ~ yrs.service + rank + discipline + sex,
+             data = Salaries)
+Anova(model2)
+```
+
+```{r}
+library(car)
+model3 <- lm(salary ~  rank + discipline,
+             data = Salaries)
+Anova(model3)
+
+```
+
+
+
+
+##Regression with Interaction
 
 
 ```{r}
@@ -72,8 +299,64 @@ RMSE(predictions, test.data$sales)
 R2(predictions, test.data$sales)
 ```
 
-          
-                                                                                       
+                                                                    ---
+title: "Quarto File"
+author: "Pudao, Rizza B."
+date: "2023-01-10"
+output: pdf_document
+---
+
+
+**`1. What package are they talking about?`**
+
+- They are talking about **Quarto**, an open-source scientific and technical publishing system built on Pandoc.
+
+**`2. Why is there a need to shift from markdown to the said package?`**
+
+- Quarto is RStudio's multilingual, next-generation R Markdown product, featuring a host of brand-new features and functionalities, and renders most existing Rmd files without changing them because, like R Markdown, it uses Knitr to run R code. There’s a need to shift from markdown to the said package because It has numerous other built-in output formats and many more options for customizing each format. Additionally, it also includes built-in capabilities for unique project types including websites, books, and blogs rather than relying on external packages. And since Quarto is open source, others can also contribute to its functionality by writing extensions. You can export Quarto documents in more than 40 different file formats including Word, OpenOffice, PowerPoint, ePub, Jira Wiki, Jupyter, Observable JS, complete websites, and ebooks. R Markdown can generate some of those, but not all. There are also some useful conversion functions, such as converting between .ipynb Jupyter notebooks and .qmd Quarto documents that can be read by any text editor. Quarto doesn't have a dependency or requirement for R. Unlike to R Markdown wherein it is fundamentally tied to R which severely limits the number of practitioners it can benefit. In other words, cool new features are much more likely to appear in Quarto.
+
+**`3. What inspired/sparked the said shift?`**
+
+- "Quarto enables collaborating across coding languages," Julia Stewart. aims to highlight errors before you try rendering your document and finding out that it won’t work. And it doesn't have a dependency or requirement for R.
+
+**`4. Are you up to the challenge of the said shift, learning and applying it on your future as math teachers?`**
+
+- It is said that Quarto is open source, which allows anyone to contribute to its functionality by writing extensions, serves as assistance in writing YAML, and helps us to highlight errors before rendering our document. In addition, since Quarto is open source Another draw is the "high internal consistency," which allows for the same syntax to be used in a wider variety of languages and formats. 
+yes! Since I was unfamiliar with this shift in the first place, I am up for the challenge, but I'm still eager to learn about it and use and apply it because I believe it can be of great benefit to me as a future math teacher. 
+
+**`5. what said features in the package did you like best ?please discuss.`**
+
+- "Quarto enables collaborating across coding languages," Julia Stewart.  Quarto is intended to be helpful for anyone who wishes to write repeatable documents. Unlike R Markdown docs, which use R and knitr to render your text, Quarto does not require R. Quarto divides calculations into distinct pluggable language "engines," which makes it simpler to provide this cross-language capability. You can export Quarto documents in more than 40 different file formats including Word, OpenOffice, PowerPoint, ePub, Jira Wiki, Jupyter, Observable JS, complete websites, and ebooks. Additionally, it also includes built-in capabilities for unique project types including websites, books, and blogs rather than relying on external packages.
+
+
+
+  ---
+title: "GPT Q&A"
+editor: visual
+---
+
+Question & Answering with OpenAI's GPT Models
+
+Question: tips on how to build self-confident.
+
+Identify and challenge negative thoughts: Take some time to reflect on your thoughts and challenge any negative beliefs you may have about yourself.
+
+Set realistic goals: Set achievable goals for yourself and celebrate your successes.
+
+Take care of yourself: Make sure you are taking care of your physical and mental health by eating well, exercising, and getting enough sleep.
+
+Practice positive self-talk: Talk to yourself like you would to a friend and focus on the things you like about yourself.
+
+Take risks: Take risks and try new things to help build your confidence.
+
+Celebrate your accomplishments: Take time to recognize and celebrate your accomplishments, no matter how small.
+
+Surround yourself with positive people: Surround yourself with positive people who make you feel good about yourself.
+
+                       
+
+
+
 
 
 
